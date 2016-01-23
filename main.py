@@ -15,8 +15,8 @@ def main():
     pendulum = InvertedPendulum()
     x = []
     O = []
-    for n in np.arange(0, 10, 0.5):
-        x, O = pendulum.applyforce(u=n, tmax=0.83, timeslice=0.001)
+    for n in np.arange(0.5, 10,1.5):
+        x, O = pendulum.applyforce(u=n, tmax=5, timeslice=0.01)
 
         showGraph(O)
 
@@ -35,8 +35,6 @@ def showGraph(theta):
 
     ax.plot(x,y,'b.')
     plt.show()
-
-
 
 
 def x1():
