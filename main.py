@@ -2,6 +2,8 @@
 
 
 from classes.invertedpendulum import InvertedPendulum
+from classes.population import Population
+
 from fractions import Fraction
 from math import sin, cos
 import matplotlib.pyplot as plt
@@ -9,32 +11,78 @@ import numpy as np
 
 
 def main():
-
     #neuralNet = NeuralNetwork()
 
     pendulum = InvertedPendulum()
-    x = []
-    O = []
-    for n in np.arange(0.5, 10,1.5):
-        x, O = pendulum.applyforce(u=n, tmax=5, timeslice=0.01)
-
-        showGraph(O)
+    for n in np.arange(-0.5, 10, 0.5):
+        cart, theta = pendulum.applyforce(u=n, tmax=2.5, timeslice=0.01)
+        x, y = transform(theta)
+        showGraph(x, y, cart, 0.01, "Relative motion of cart and pendulum u={0}".format(n))
 
 
+def nnmain():
+    pop = Population(200)
 
-def showGraph(theta):
+
+def transform(theta):
     r = 1
     x = []
     y = []
-    for n in range(len(theta)):
-        x.append(r*cos(theta[n]))
-        y.append(r*sin(theta[n]))
+    for n in range(int(len(theta))):
+        # since we placed theta=0 up vertically we need to shift
+        # the axis 90 degrees counterclockwise (-pi/2)
+        # so x becomes sin(t) and y cos(t)
+        y.append(r*cos(theta[n]))
+        x.append(r*sin(theta[n]))
 
-    fig = plt.figure()
-    ax  = fig.add_subplot(111)
+    return x, y
 
-    ax.plot(x,y,'b.')
+def showGraph(x, y, cart, timeslice=0.01, caption=""):
+    #TODO make sure the x axis reflects the time it takes to drop
+
+    fig, axes = plt.subplots(nrows=1, ncols=3, sharex=False, sharey=False,
+                             tight_layout=True, figsize=(9, 4.5))
+    fig.suptitle(caption, fontsize=18, fontweight='bold')
+
+    ax = axes[0]
+    ax.set_title('Pendulum')
+    ax.plot(x, y)
+    ax.spines['left'].set_position(('axes', 0.0))
+    ax.spines['right'].set_color('none')
+    ax.spines['bottom'].set_position(('axes', 0.0))
+    ax.spines['top'].set_color('none')
+    ax.spines['left'].set_smart_bounds(True)
+    ax.spines['bottom'].set_smart_bounds(True)
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+
+    ticks = np.arange(min(x), max(x) * timeslice)
+    labels = range(ticks.size)
+    ax.set_xticks(ticks, labels)
+    ax.xlabel('seconds')
+
+    x1 = []
+    for n in range(len(cart)):
+        x1.append(x[n] + cart[n])
+
+    ax = axes[1]
+    ax.set_title('Pendulum respect cart')
+    ax.plot(x1, y)
+    ax.spines['left'].set_position(('axes', 0.0))
+    ax.spines['right'].set_color('none')
+    ax.spines['bottom'].set_position(('axes', 0.0))
+    ax.spines['top'].set_color('none')
+    ax.spines['left'].set_smart_bounds(True)
+    ax.spines['bottom'].set_smart_bounds(True)
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+    ax.set_xticks(ticks, labels)
+    ax.xlabel('seconds')
+
     plt.show()
+
+
+
 
 
 def x1():
@@ -68,7 +116,7 @@ def create_pi_labels(a, b, step):
     max_denominator = int(1/step)
     # i added this line and the .limit_denominator to solve an
     # issue with floating point precision
-    # because of floataing point precision Fraction(1/3) would be
+    # because of floating point precision Fraction(1/3) would be
     # Fraction(6004799503160661, 18014398509481984)
 
     values = np.arange(a, b+step/10, step)
@@ -98,7 +146,9 @@ def create_pi_labels(a, b, step):
     return ticks, labels
 
 if __name__ == '__main__':
-    main()
+    #main()
+
+    nnmain()
 
 
 

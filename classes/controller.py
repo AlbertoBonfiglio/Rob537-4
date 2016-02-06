@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-class Chromosome (object):
+class Controller (object):
 
     def __init__(self):
         pass

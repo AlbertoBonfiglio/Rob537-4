@@ -76,12 +76,16 @@ class InvertedPendulum (object):
                 xArray.append(x)
                 thetaArray.append(theta)
 
+                #limits to 180 degrees excursion
+                if theta <= -(pi/2) or theta >= (3*pi/2):
+                    break
+
             return xArray, thetaArray
         except Exception as ex:
             print(ex)
 
 
-    #region Deprecated Functions
+#region 'Deprecated Functions'
 
     def __getLinearAccelleration(self, u=1, theta=0, thetadot=0, theta2dot=0):
         # x2dot = ( ml sinΘ Θdot^2 - ml cosΘ Θ2dot + u) / (M+m)
@@ -107,4 +111,5 @@ class InvertedPendulum (object):
         except ZeroDivisionError:
             return thetadot
 
-    #endregion
+
+#endregion
