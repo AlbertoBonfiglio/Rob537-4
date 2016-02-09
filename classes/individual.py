@@ -1,16 +1,29 @@
 #!/usr/bin/python3
 
+from random import uniform
+from classes.invertedpendulum import InvertedPendulum
 
 class Individual (object):
 
-    def __init__(self, genome, threshold=0.1):
+    def __init__(self, genome, M=10, m=1, l=1, threshold=0.1):
         self.threshold = threshold
-        self.genome = genome    #this is the actual data we are evolving weights for
-        self.alleles = [0 for n in range(len(genome))] #these are the actual weights we are evolving
+        #there are the physics constants for each individual
+        self.M = M
+        self.m = m
+        self.l = l
+
+        #this is the actual data we are evolving weights for
+        self.genome = genome
+
+        #these are the actual weights we are evolving
+        self.alleles = [uniform(-10, 10) for n in range(len(genome))]
+        self.pendulum = InvertedPendulum(M, m, l)
 
 
 
-    def fitness(self, func=time_to_ground):
+    def fitness(self, func=None):
+        if func == None:
+            func = self.time_to_ground()
         return func()
 
 
@@ -19,6 +32,9 @@ class Individual (object):
     #returns milliseconds
     def time_to_ground(self):
         #TODO perform calulatoin
+        time = self.pendulum.applyforce2(u=10)
+
+
         return 0
 
     #in this instance we calculate fitness based on how long

@@ -3,6 +3,7 @@
 
 from classes.invertedpendulum import InvertedPendulum
 from classes.population import Population
+from classes.controller import Controller
 
 from fractions import Fraction
 from math import sin, cos
@@ -21,7 +22,15 @@ def main():
 
 
 def nnmain():
-    pop = Population(200)
+    contr = Controller()
+    contr.start()
+
+    while contr.isRunning():
+        pass
+
+    genome = [0,0,0,0,0,0]
+    pop = Population(genome, 100)
+    fit = pop.individuals[3].fitness()
 
 
 def transform(theta):

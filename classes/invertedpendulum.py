@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 # eq1 --> (M+m)x2dot - ml sinΘ Θdot^2 + ml cosΘ Θ2dot = u
-# eq1 --> m x2dot cosΘ + ml Θ2dot = mg sinΘ
+# eq2 --> m x2dot cosΘ + ml Θ2dot = mg sinΘ --> x2d cos0 + l 02dot - g sin0 = 0
 
 
 from math import sin, cos, pi, degrees
@@ -12,10 +12,19 @@ g = 9.8 #gravity acceleration constant (m/s**2)
 
 class InvertedPendulum (object):
 
-    def __init__(self):
-        self.M = 10  #kg mass of cart
-        self.m = 1   #kg mass of pendulum
-        self.l = 1   #lenght of pendulum arm
+    def __init__(self, M=10, m=1, l=1):
+        self.M = M   # kg mass of cart
+        self.m = m   # kg mass of pendulum
+        self.l = l   # lenght of pendulum arm
+
+        self.x = 0
+        self.xdot = 0
+        self.x2dot = 0
+        self.theta = 0
+        self.thetadot = 0
+        self.theta2dot = 0
+
+
 
     def __getLinearAccelleration2(self, u=1, theta=0, thetadot=0):
         # Calculates the linear acceleration
@@ -50,6 +59,7 @@ class InvertedPendulum (object):
         except ZeroDivisionError:
             return thetadot
 
+
     def applyforce(self, u=1, tmax=10, timeslice=0.01):
         try:
             xArray = []
@@ -83,6 +93,40 @@ class InvertedPendulum (object):
             return xArray, thetaArray
         except Exception as ex:
             print(ex)
+
+
+    #Returns the time it takes to hit the ground
+    def applyforce2(self, u=1, x=0, xdot=0, x2dot=0, theta=0, thetadot=0, theta2dot=0, tmax=10, timeslice=0.01):
+        try:
+            _x = x
+            _xdot = xdot
+            _theta = theta
+            _thetadot = thetadot
+
+            _x2dot = self.__getLinearAccelleration(u, _theta, _thetadot)
+            _theta2dot = self.__getAngularAccelleration(_x2dot, _theta)
+
+            #_xdot = self.__getInstantaneousVelocity(_xdot, _x2dot, tmax)
+            #_thetadot = self.__getInstAngularVelocity(_thetadot, _theta2dot, tmax)
+
+            for t in arange(timeslice, tmax, timeslice):
+                _xdot += (_x2dot * timeslice)
+                _x = _x + (_xdot * timeslice)
+
+                _thetadot += (_theta2dot * timeslice)
+                _theta = _theta + (_thetadot * timeslice)
+
+                print('Position -> {0}'.format(_x))
+                print('Theta -> {0} - {1}'.format(theta, degrees(_theta)))
+
+                #limits to 180 degrees excursion
+                if _theta <= -(pi/2) or _theta >= (3*pi/2):
+                    break
+
+            return t
+        except Exception as ex:
+            print(ex)
+
 
 
 #region 'Deprecated Functions'
